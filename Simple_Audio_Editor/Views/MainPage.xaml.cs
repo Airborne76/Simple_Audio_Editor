@@ -15,6 +15,7 @@ namespace Simple_Audio_Editor.Views
         {
             InitializeComponent();
             ViewModel.Initialize();
+            NavigationCacheMode = Windows.UI.Xaml.Navigation.NavigationCacheMode.Required;
             Initialize();
         }
         private void Initialize()

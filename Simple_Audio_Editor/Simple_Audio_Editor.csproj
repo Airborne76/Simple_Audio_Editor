@@ -116,6 +116,7 @@
     <Compile Include="Activation\ActivationHandler.cs" />
     <Compile Include="BackgroundTasks\BackgroundTask.cs" />
     <Compile Include="BackgroundTasks\BackgroundTask1.cs" />
+    <Compile Include="Convert\DoubleToGridLength.cs" />
     <Compile Include="Convert\DoubleToLyricTimeString.cs" />
     <Compile Include="Convert\DoubleToWidth.cs" />
     <Compile Include="Convert\TimeSpanToDouble.cs" />
@@ -127,6 +128,7 @@
     <Compile Include="Helpers\TaskExtensions.cs" />
     <Compile Include="Helpers\TimeSpanExtension.cs" />
     <Compile Include="Helpers\UIDispatcher.cs" />
+    <Compile Include="Models\AudioClip.cs" />
     <Compile Include="Models\DragDropCompletedData.cs" />
     <Compile Include="Models\DragDropData.cs" />
     <Compile Include="Models\DragDropStartingData.cs" />
@@ -172,6 +174,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Styles\ListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Styles\Page.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

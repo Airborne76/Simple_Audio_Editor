@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.Storage.Pickers;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 
@@ -19,11 +21,16 @@ namespace Simple_Audio_Editor.ViewModels
     {
         public MainViewModel()
         {
+            Current = this;
         }
+
+        public static MainViewModel Current;
         private IMediaPlaybackSource _source;
 
+        public StorageFile audioFile;
         public ObservableCollection<TimePoint> timePoints = new ObservableCollection<TimePoint>();
-
+        public ObservableCollection<AudioClip> audioClips = new ObservableCollection<AudioClip>();
+       
         private bool UserChangeTime = false;
 
         public IMediaPlaybackSource Source
@@ -32,7 +39,6 @@ namespace Simple_Audio_Editor.ViewModels
             set { Set(ref _source, value); }
         }
 
-
         public void silder_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             UserChangeTime = true;
@@ -40,7 +46,7 @@ namespace Simple_Audio_Editor.ViewModels
         public void silder_Pointerreleased(object sender, PointerRoutedEventArgs e)
         {
             mediaPlayer.PlaybackSession.Position = TimeSpan;
-            Debug.WriteLine(TimeSpan);
+            //Debug.WriteLine(TimeSpan);
             UserChangeTime = false;
         }
         private long pointTime = 0;
@@ -52,7 +58,6 @@ namespace Simple_Audio_Editor.ViewModels
             }            
         }
 
-
         public void processSilder_Pointerreleased(object sender, PointerRoutedEventArgs e)
         {
             if (mediaPlayer.Source != null && Maxposition != 0)
@@ -61,17 +66,34 @@ namespace Simple_Audio_Editor.ViewModels
                 {
                     TimeSpan timeSpanstart = TimeSpanSwtich.DoubleToTimeSpan((sender as Slider).Value);
                     TimeSpan timespanend = TimeSpanSwtich.DoubleToTimeSpan(Maxposition)-timeSpanstart;
-                    timePoints.Add(new TimePoint() { timeSpanFromStart = timeSpanstart, timeSpanFromEnd = timespanend });
-                    Debug.WriteLine($"{ timeSpanstart}{ timespanend}");
+                    timePoints.Add(new TimePoint() { timeSpanFromStart = timeSpanstart, timeSpanFromEnd = timespanend,fulltime=Maxposition });
+                    if (timePoints.Count==1)
+                    {
+                        Debug.WriteLine(timeSpanstart.ToLyricTimeString());
+                    }
+                    if (timePoints.Count==2)
+                    {
+                        if (!(timePoints[0].timeDouble==timePoints[1].timeDouble))
+                        {
+                            ObservableCollection<TimePoint> points = new ObservableCollection<TimePoint>();
+                            foreach (var point in timePoints)
+                            {
+                                points.Add(point);
+                            }
+                            audioClips.Add(new AudioClip() { Clips = points });
+                            timePoints.Clear();
+                        }
+                        else
+                        {
+                            timePoints.RemoveAt(1);
 
+                        }
+                    }
+                    //Debug.WriteLine($"{ timeSpanstart}{ timespanend}");
                 }
                 pointTime = 0;
             }
         }
-
-
-
-
 
         private TimeSpan timespan=TimeSpan.Zero;
         public TimeSpan TimeSpan
@@ -92,6 +114,37 @@ namespace Simple_Audio_Editor.ViewModels
         }
 
         public MediaPlayer mediaPlayer = new MediaPlayer();
+
+        private bool isSourceLoaded=false;
+        public bool IsSourceLoaded
+        {
+            get { return isSourceLoaded; }
+            set
+            {
+                Set(ref isSourceLoaded, value);
+                if (value)
+                {
+                    SelectedVisibility = Visibility.Collapsed;
+                    PlayVisibility = Visibility.Visible;
+                }
+            }
+        }
+
+        private Visibility selectedVisibility=Visibility.Visible;
+        public Visibility SelectedVisibility
+        {
+            get { return selectedVisibility; }
+            set { Set(ref selectedVisibility, value); }
+        }
+
+        private Visibility playVisibility = Visibility.Collapsed;
+        public Visibility PlayVisibility
+        {
+            get { return playVisibility; }
+            set { Set(ref playVisibility, value); }
+        }
+
+
 
         public void Initialize()
         {
@@ -222,13 +275,12 @@ namespace Simple_Audio_Editor.ViewModels
                     {
                         return;
                     }
+                    audioFile = file;
                     var info = await file.Properties.GetMusicPropertiesAsync();
-                    //Source = MediaSource.CreateFromStorageFile(file);
                     mediaPlayer.Source= MediaSource.CreateFromStorageFile(file);
                     await Task.Delay(1000);
-                    Maxposition = mediaPlayer.PlaybackSession.NaturalDuration.TotalMinutes;                    
-                    //mediaPlayer.PlaybackSession
-
+                    Maxposition = mediaPlayer.PlaybackSession.NaturalDuration.TotalMinutes;
+                    IsSourceLoaded = true;
                     //MusicInfo = $"title:{info.Title}\r\n AlbumArtist:{info.AlbumArtist}";
                 });
             }

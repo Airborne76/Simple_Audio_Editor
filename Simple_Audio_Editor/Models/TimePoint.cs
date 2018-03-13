@@ -18,6 +18,6 @@ namespace Simple_Audio_Editor.Models
                 return TimeSpanSwtich.TimeSpanToDouble(timeSpanFromStart);
             }            
         }
-
+        public double fulltime { get; set; }
     }
 }

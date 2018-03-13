@@ -12,6 +12,7 @@
     <Page.Resources>
         <cvt:TimeSpanToDouble x:Key="TimeSpanToDouble" />
         <cvt:DoubleToLyricTimeString x:Key="DoubleToLyricTimeString" />
+        <cvt:DoubleToGridLength x:Key="DoubleToGridLength" />
     </Page.Resources>
     <Page.Style>
         <StaticResource ResourceKey="PageStyle"/>
@@ -52,38 +53,73 @@
         <Grid 
             Grid.Row="1" 
             Background="{ThemeResource SystemControlPageBackgroundChromeLowBrush}">
-            <StackPanel>
-                <Button Content="select" HorizontalAlignment="Center" Command="{x:Bind Mode=OneWay, Path=ViewModel.Select}"/>
-                <Button Content="{x:Bind Mode=OneWay, Path=ViewModel.Playstatus}" HorizontalAlignment="Center" Command="{x:Bind Mode=OneWay, Path=ViewModel.SwitchPlay}" />
-                <Slider Width="100" Minimum="0" Maximum="100" Value="{x:Bind Mode=TwoWay, Path=ViewModel.MediaVolume}"/>
-                <!--<Slider Minimum="0" Maximum="{x:Bind ViewModel.Maxposition,Mode=OneWay}" Value="{x:Bind ViewModel.Mediaposition,Mode=TwoWay}" SmallChange="0.01" LargeChange="0.1" StepFrequency="0.01"></Slider>-->
-                <Grid>
-                    <StackPanel>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <ItemsControl ItemsSource="{x:Bind ViewModel.timePoints,Mode=OneWay}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Grid/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="models:TimePoint">
-                                        <TextBlock Text="{x:Bind timeDouble}" >
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+            <Grid Margin="10,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Row="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="1">
+                            <Button HorizontalAlignment="Center" Command="{x:Bind Mode=OneWay, Path=ViewModel.Select}" Background="Transparent" Visibility="{x:Bind ViewModel.SelectedVisibility,Mode=OneWay}">
+                                <Button.Content>
+                                <SymbolIcon Symbol="OpenFile"/>
+                            </Button.Content>
+                            </Button>
+                            <Button Content="{x:Bind Mode=OneWay, Path=ViewModel.Playstatus}" HorizontalAlignment="Center" Command="{x:Bind Mode=OneWay, Path=ViewModel.SwitchPlay}" Visibility="{x:Bind ViewModel.PlayVisibility,Mode=OneWay}"  Background="Transparent"/>
                         </Grid>
-                        <Slider x:Name="silder" Style="{StaticResource MusicSliderStyle}"  Minimum="0" Maximum="{x:Bind Mode=OneWay, Path=ViewModel.Maxposition}" Value="{x:Bind Converter={StaticResource TimeSpanToDouble}, Mode=TwoWay, Path=ViewModel.TimeSpan}" SmallChange="0.01" LargeChange="0.1" StepFrequency="0.01" ThumbToolTipValueConverter="{StaticResource DoubleToLyricTimeString}"/>
-                        <Grid>
-                            <Slider x:Name="processSilder" Background="Transparent" Style="{StaticResource ProcessSliderStyle}" Minimum="0" Maximum="{x:Bind Mode=OneWay, Path=ViewModel.Maxposition}" Value="0" SmallChange="0.01" LargeChange="0.1" StepFrequency="0.01" ThumbToolTipValueConverter="{StaticResource DoubleToLyricTimeString}" />
+                        <Grid Grid.Column="0">
+                            <Button Background="Transparent">
+                                <Button.Content>
+                                    <SymbolIcon Symbol="Volume"/>
+                                </Button.Content>
+                                <Button.Flyout>
+                                    <Flyout>
+                                        <StackPanel>
+                                            <TextBlock Text="Volume"/>
+                                            <Slider  Width="100" Minimum="0" Maximum="100" Value="{x:Bind Mode=TwoWay, Path=ViewModel.MediaVolume}"/>
+                                        </StackPanel>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>                             
                         </Grid>
-                    </StackPanel>
-                </Grid>
-            </StackPanel>
+                    </Grid>
+                    <Grid>
+                        <StackPanel>
+                            <Slider x:Name="silder" Style="{StaticResource MusicSliderStyle}"  Minimum="0" Maximum="{x:Bind Mode=OneWay, Path=ViewModel.Maxposition}" Value="{x:Bind Converter={StaticResource TimeSpanToDouble}, Mode=TwoWay, Path=ViewModel.TimeSpan}" SmallChange="0.01" LargeChange="0.1" StepFrequency="0.01" ThumbToolTipValueConverter="{StaticResource DoubleToLyricTimeString}"/>
+                            <Grid>
+                                <Slider x:Name="processSilder" Background="Transparent" Style="{StaticResource ProcessSliderStyle}" Minimum="0" Maximum="{x:Bind Mode=OneWay, Path=ViewModel.Maxposition}" Value="0" SmallChange="0.01" LargeChange="0.1" StepFrequency="0.01" ThumbToolTipValueConverter="{StaticResource DoubleToLyricTimeString}" />
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+                
+                <ListView Grid.Row="1" SelectionMode="None" ItemsSource="{x:Bind ViewModel.audioClips,Mode=OneWay}" ItemContainerStyle="{StaticResource  TimeSpanListViewItemStyle}" >
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="models:AudioClip">
+                            <StackPanel>
+                                <Grid MinHeight="15">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="{x:Bind FirstTimeLength,Converter={StaticResource DoubleToGridLength}}" />
+                                        <ColumnDefinition Width="{x:Bind SecondTimeLength,Converter={StaticResource DoubleToGridLength}}" />
+                                        <ColumnDefinition Width="{x:Bind ThirdTimeLength,Converter={StaticResource DoubleToGridLength}}" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Background="Transparent" />
+                                    <Border Grid.Column="1" Background="Red" />
+                                    <Border Grid.Column="2" Background="Transparent" />
+                                    <Button Content="play" Command="{x:Bind Clip}" />
+                                </Grid>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+
+                </ListView>
+            </Grid>
         </Grid>
     </Grid>
 </Page>
