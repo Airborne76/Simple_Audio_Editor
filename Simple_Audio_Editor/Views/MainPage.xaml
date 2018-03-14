@@ -110,9 +110,12 @@
                                         <ColumnDefinition Width="{x:Bind ThirdTimeLength,Converter={StaticResource DoubleToGridLength}}" />
                                     </Grid.ColumnDefinitions>
                                     <Border Grid.Column="0" Background="Transparent" />
-                                    <Border Grid.Column="1" Background="Red" />
+                                    <Border Grid.Column="1" Background="{ThemeResource InkToolbarAccentColorThemeBrush}" />
                                     <Border Grid.Column="2" Background="Transparent" />
-                                    <Button Content="play" Command="{x:Bind Clip}" />
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                        <Button  Content="play" Command="{x:Bind Play}" />
+                                        <Button  Content="save" Command="{x:Bind Save}" />
+                                    </StackPanel>
                                 </Grid>
                             </StackPanel>
                         </DataTemplate>

@@ -62,34 +62,68 @@ namespace Simple_Audio_Editor.Models
 
         private MediaComposition composition;
 
-        public ICommand Clip
+        public AudioClip()
+        {
+            ClipAudio();
+        }
+        public async void ClipAudio()
+        {
+            if (MainViewModel.Current != null)
+            {
+                var clip = await MediaClip.CreateFromFileAsync(MainViewModel.Current.audioFile);
+                clip.TrimTimeFromStart = StartTime.timeSpanFromStart;
+                clip.TrimTimeFromEnd = EndTime.timeSpanFromEnd;
+                composition = new MediaComposition();
+                composition.Clips.Add(clip);
+            }
+        }
+
+        public ICommand Save
         {
             get
             {
                 return new RelayCommand(async() =>
+                {
+                    if (composition != null)
+                    {
+                        var picker = new Windows.Storage.Pickers.FileSavePicker();
+                        picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.MusicLibrary;
+                        picker.FileTypeChoices.Add("MP3 files", new List<string>() { ".mp3" });
+                        //picker.FileTypeChoices.Add("MP3 files", new List<string>() { ".mp4" });
+                        picker.SuggestedFileName = "TrimmedClip.mp3";
+                        StorageFile file = await picker.PickSaveFileAsync();
+                        if (file != null)
+                        {
+                            var saveOperation =await composition.RenderToFileAsync(file, MediaTrimmingPreference.Precise);
+                        }
+                    }
+                });
+            }
+        }
+
+        public ICommand Play
+        {
+            get
+            {
+                return new RelayCommand(() =>
                {
-                   if (MainViewModel.Current!=null)
+                   if (composition != null)
                    {
-                       var clip = await MediaClip.CreateFromFileAsync(MainViewModel.Current.audioFile);
-                       clip.TrimTimeFromStart = StartTime.timeSpanFromStart;
-                       clip.TrimTimeFromEnd = EndTime.timeSpanFromEnd;
-                       composition = new MediaComposition();
-                       composition.Clips.Add(clip);
+                       //var clip = await MediaClip.CreateFromFileAsync(MainViewModel.Current.audioFile);
+                       //clip.TrimTimeFromStart = StartTime.timeSpanFromStart;
+                       //clip.TrimTimeFromEnd = EndTime.timeSpanFromEnd;
+                       //composition = new MediaComposition();
+                       //composition.Clips.Add(clip);
+
                        MediaPlayer mediaPlayer = new MediaPlayer();
                        mediaPlayer.Source = MediaSource.CreateFromMediaStreamSource(composition.GeneratePreviewMediaStreamSource(0, 0));
+                       if (MainViewModel.Current != null)
+                       {
+                           mediaPlayer.Volume = MainViewModel.Current.MediaVolume;
+                       }
                        mediaPlayer.Play();
 
-                       // var picker = new Windows.Storage.Pickers.FileSavePicker();
-                       // picker.SuggestedStartLocation = Windows.Storage.Pickers.PickerLocationId.VideosLibrary;
-                       // picker.FileTypeChoices.Add("MP3 files", new List<string>() { ".mp3" });
-                       // //picker.FileTypeChoices.Add("MP3 files", new List<string>() { ".mp4" });
-                       // picker.SuggestedFileName = "TrimmedClip.mp3";                       
-                       // StorageFile file = await picker.PickSaveFileAsync();
-                       //if (file != null)
-                       //{
-                       //    var saveOperation = composition.RenderToFileAsync(file, MediaTrimmingPreference.Precise);
-                       //}
-
+                       
                    }
                });
             }
