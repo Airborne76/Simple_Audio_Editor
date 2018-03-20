@@ -3,14 +3,18 @@ using Simple_Audio_Editor.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.Media.Core;
 using Windows.Media.Editing;
+using Windows.Media.MediaProperties;
 using Windows.Media.Playback;
 using Windows.Storage;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace Simple_Audio_Editor.Models
 {
@@ -59,6 +63,13 @@ namespace Simple_Audio_Editor.Models
                 }
             }
         }
+        private MediaSource mediaStream;
+        public MediaSource MediaStream
+        {
+            get { return mediaStream; }
+            set { Set(ref mediaStream, value); }
+        }
+        public int ID { get; set; } 
 
         private MediaComposition composition;
 
@@ -66,6 +77,22 @@ namespace Simple_Audio_Editor.Models
         {
             ClipAudio();
         }
+        public RoutedEventHandler LoadedEventHandler
+        {
+            get
+            {
+                return (e, s) =>
+                {
+                    if (MediaStream!=null)
+                    {
+                        (e as MediaPlayerElement).Source = MediaStream;
+                    }
+                };
+            }
+        }
+
+
+
         public async void ClipAudio()
         {
             if (MainViewModel.Current != null)
@@ -75,6 +102,9 @@ namespace Simple_Audio_Editor.Models
                 clip.TrimTimeFromEnd = EndTime.timeSpanFromEnd;
                 composition = new MediaComposition();
                 composition.Clips.Add(clip);
+
+                MediaStream = MediaSource.CreateFromMediaStreamSource(composition.GenerateMediaStreamSource(MediaEncodingProfile.CreateMp3(AudioEncodingQuality.High)));
+                Debug.WriteLine(MediaStream.State);
             }
         }
 
@@ -101,7 +131,7 @@ namespace Simple_Audio_Editor.Models
             }
         }
 
-        public ICommand Play
+        public ICommand Delete
         {
             get
             {
@@ -115,14 +145,24 @@ namespace Simple_Audio_Editor.Models
                        //composition = new MediaComposition();
                        //composition.Clips.Add(clip);
 
-                       MediaPlayer mediaPlayer = new MediaPlayer();
-                       mediaPlayer.Source = MediaSource.CreateFromMediaStreamSource(composition.GeneratePreviewMediaStreamSource(0, 0));
-                       if (MainViewModel.Current != null)
-                       {
-                           mediaPlayer.Volume = MainViewModel.Current.MediaVolume;
-                       }
-                       mediaPlayer.Play();
+                       //MediaPlayer mediaPlayer = new MediaPlayer();
+                       //mediaPlayer.Source = MediaSource.CreateFromMediaStreamSource(composition.GenerateMediaStreamSource());
 
+                       //if (MainViewModel.Current != null)
+                       //{
+                       //    mediaPlayer.Volume = MainViewModel.Current.MediaVolume;
+                       //}
+                       //mediaPlayer.Play();
+                       if (MainViewModel.Current!=null)
+                       {
+                           if (MainViewModel.Current.audioClips.Where(i=>i.ID==ID).Count()>0)
+                           {
+                               
+                               
+                               MainViewModel.Current.audioClips.Remove(MainViewModel.Current.audioClips.Where(i => i.ID == ID).FirstOrDefault());
+                               MediaStream.Dispose();
+                           }
+                       }
                        
                    }
                });

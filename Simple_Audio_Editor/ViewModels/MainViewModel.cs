@@ -7,13 +7,16 @@ using System.Windows.Input;
 using Simple_Audio_Editor.Convert;
 using Simple_Audio_Editor.Helpers;
 using Simple_Audio_Editor.Models;
+using Simple_Audio_Editor.Views;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using Windows.Storage;
+using Windows.Storage.FileProperties;
 using Windows.Storage.Pickers;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace Simple_Audio_Editor.ViewModels
 {
@@ -30,6 +33,7 @@ namespace Simple_Audio_Editor.ViewModels
         public StorageFile audioFile;
         public ObservableCollection<TimePoint> timePoints = new ObservableCollection<TimePoint>();
         public ObservableCollection<AudioClip> audioClips = new ObservableCollection<AudioClip>();
+        private int ID = 0;
        
         private bool UserChangeTime = false;
 
@@ -80,7 +84,8 @@ namespace Simple_Audio_Editor.ViewModels
                             {
                                 points.Add(point);
                             }
-                            audioClips.Add(new AudioClip() { Clips = points });
+                            audioClips.Add(new AudioClip() { Clips = points ,ID=ID});
+                            ID++;
                             timePoints.Clear();
                         }
                         else
@@ -93,8 +98,7 @@ namespace Simple_Audio_Editor.ViewModels
                 }
                 pointTime = 0;
             }
-        }
-
+        }        
         private TimeSpan timespan=TimeSpan.Zero;
         public TimeSpan TimeSpan
         {
@@ -144,13 +148,47 @@ namespace Simple_Audio_Editor.ViewModels
             set { Set(ref playVisibility, value); }
         }
 
+        private Visibility musicVisibility = Visibility.Collapsed;
+        public Visibility MusicInfoVisibility
+        {
+            get { return musicVisibility; }
+            set { Set(ref musicVisibility, value); }
+        }
 
+        private MusicInfo musicInfo = new MusicInfo();
+        public MusicInfo MusicInfo
+        {
+            get { return musicInfo; }
+            set
+            {
+                Set(ref musicInfo, value);
+                if (value.bitmapImage!=null)
+                {
+                    MusicInfoVisibility = Visibility.Visible;
+                }
+            }
+        }
+
+        public ICommand GetMusicInfo
+        {
+            get
+            {
+                return new RelayCommand(async() =>
+                {
+                    if (MusicInfo.musicProperties!=null)
+                    {
+                        var dialog = new MusicInfoDialog(MusicInfo);
+                        await dialog.ShowAsync();
+                    }
+                });
+            }
+        }
 
         public void Initialize()
         {
             mediaPlayer.AutoPlay = false;
             mediaPlayer.Volume = MediaVolume/100;
-
+            //mediaPlayer.PlaybackSession
             mediaPlayer.PlaybackSession.PositionChanged += (m, e) =>
             {
                 UIDispatcher.RunAsync(() =>
@@ -276,18 +314,40 @@ namespace Simple_Audio_Editor.ViewModels
                         return;
                     }
                     audioFile = file;
-                    var info = await file.Properties.GetMusicPropertiesAsync();
+                    
+
+                    using (StorageItemThumbnail thumbnail = await file.GetThumbnailAsync(ThumbnailMode.SingleItem))
+                    {
+                        var info = await file.Properties.GetMusicPropertiesAsync();
+                        MusicInfo musicInfo = new MusicInfo();
+                        if (thumbnail != null)
+                        {
+                            BitmapImage bitmapImage = new BitmapImage();
+                            //musicInfo.storageItemThumbnail = thumbnail;
+                            bitmapImage.SetSource(thumbnail);
+                            musicInfo.bitmapImage = bitmapImage;
+                        }
+                        if (info!=null)
+                        {
+                            musicInfo.musicProperties = info;
+                        }
+                        MusicInfo = musicInfo;
+                    }
                     mediaPlayer.Source= MediaSource.CreateFromStorageFile(file);
-                    await Task.Delay(1000);
+
+                    await Task.Run(async () =>
+                    {
+                        while (mediaPlayer.PlaybackSession.NaturalDuration.TotalMinutes==0)
+                        {
+                           await Task.Delay(1);
+                        }
+                    });
+                    //await Task.Delay(1000);
                     Maxposition = mediaPlayer.PlaybackSession.NaturalDuration.TotalMinutes;
                     IsSourceLoaded = true;
                     //MusicInfo = $"title:{info.Title}\r\n AlbumArtist:{info.AlbumArtist}";
                 });
             }
         }
-
-
-
-
     }
 }

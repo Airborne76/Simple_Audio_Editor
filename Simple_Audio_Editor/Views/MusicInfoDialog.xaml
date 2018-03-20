@@ -1,0 +1,88 @@
+﻿<ContentDialog 
+    x:Class="Simple_Audio_Editor.Views.MusicInfoDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:views="using:Simple_Audio_Editor.Views"
+    xmlns:models="using:Simple_Audio_Editor.Models"
+    mc:Ignorable="d"
+    d:DesignHeight="345"
+    d:DesignWidth="550"
+    PrimaryButtonText="Ok"
+    Title="{x:Bind MusicInfo,Mode=OneWay}"
+    xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
+    >
+    <ContentDialog.TitleTemplate>
+        <DataTemplate x:DataType="models:MusicInfo">
+            <Grid HorizontalAlignment="Center" MaxHeight="450" extensions:Mouse.Cursor="Hand">
+                <Image Source="{x:Bind  bitmapImage,Mode=OneWay}" MaxWidth="450" MaxHeight="450" Margin="0"/>
+            </Grid>
+        </DataTemplate>
+    </ContentDialog.TitleTemplate>
+    <ScrollViewer>
+        <StackPanel>
+            <!--<TextBlock TextWrapping="WrapWholeWords">
+                <Run Text="{x:Bind musicProperties.Album}"></Run><LineBreak/>
+                <Run Text="{x:Bind musicProperties.AlbumArtist}"></Run><LineBreak/>
+                <Run Text="{x:Bind musicProperties.Artist}"></Run>
+            </TextBlock>-->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="4*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Album" TextWrapping="WrapWholeWords"/>
+                <TextBox Text="{x:Bind musicProperties.Album}" Grid.Column="1" BorderThickness="1" />
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="4*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="AlbumArtist" TextWrapping="WrapWholeWords"/>
+                <TextBox Text="{x:Bind musicProperties.AlbumArtist}" Grid.Column="1" BorderThickness="1"/>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="4*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Artist" TextWrapping="WrapWholeWords"/>
+                <TextBox Text="{x:Bind musicProperties.Artist}"  Grid.Column="1" BorderThickness="1"/>
+            </Grid>
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="4*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Bitrate" TextWrapping="WrapWholeWords"/>
+                <TextBox Text="{x:Bind musicProperties.Bitrate}" IsEnabled="False" Grid.Column="1" BorderThickness="1"/>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="4*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Subtitle" TextWrapping="WrapWholeWords"/>
+                <TextBox Text="{x:Bind musicProperties.Subtitle}" Grid.Column="1" BorderThickness="1"/>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="4*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Title" TextWrapping="WrapWholeWords"/>
+                <TextBox Text="{x:Bind musicProperties.Title}" Grid.Column="1" BorderThickness="1"/>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="4*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Year" TextWrapping="WrapWholeWords"/>
+                <TextBox Text="{x:Bind musicProperties.Year}" Grid.Column="1" BorderThickness="1"/>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</ContentDialog>
