@@ -292,6 +292,40 @@ namespace Simple_Audio_Editor.ViewModels
             }
         }
 
+        public async Task LoadFileAsync(StorageFile file)
+        {
+            audioFile = file;
+            using (StorageItemThumbnail thumbnail = await file.GetThumbnailAsync(ThumbnailMode.SingleItem))
+            {
+                var info = await file.Properties.GetMusicPropertiesAsync();
+                MusicInfo musicInfo = new MusicInfo();
+                if (thumbnail != null)
+                {
+                    BitmapImage bitmapImage = new BitmapImage();
+                    bitmapImage.SetSource(thumbnail);
+                    musicInfo.bitmapImage = bitmapImage;
+                }
+                if (info != null)
+                {
+                    musicInfo.musicProperties = info;
+                }
+                MusicInfo = musicInfo;
+            }
+            mediaPlayer.Source = MediaSource.CreateFromStorageFile(file);
+            await Task.Run(async () =>
+            {
+                while (mediaPlayer.PlaybackSession.NaturalDuration.TotalMinutes == 0)
+                {
+                    await Task.Delay(1);
+                }
+            });
+            Maxposition = mediaPlayer.PlaybackSession.NaturalDuration.TotalMinutes;
+            IsSourceLoaded = true;
+            audioClips.Clear();
+            timePoints.Clear();
+
+        }
+
         public ICommand Select
         {
             get
@@ -313,41 +347,36 @@ namespace Simple_Audio_Editor.ViewModels
                     {
                         return;
                     }
-                    audioFile = file;
-                    
-
-                    using (StorageItemThumbnail thumbnail = await file.GetThumbnailAsync(ThumbnailMode.SingleItem))
-                    {
-                        var info = await file.Properties.GetMusicPropertiesAsync();
-                        MusicInfo musicInfo = new MusicInfo();
-                        if (thumbnail != null)
-                        {
-                            BitmapImage bitmapImage = new BitmapImage();
-                            //musicInfo.storageItemThumbnail = thumbnail;
-                            bitmapImage.SetSource(thumbnail);
-                            musicInfo.bitmapImage = bitmapImage;
-                        }
-                        if (info!=null)
-                        {
-                            musicInfo.musicProperties = info;
-                        }
-                        MusicInfo = musicInfo;
-                    }
-                    mediaPlayer.Source= MediaSource.CreateFromStorageFile(file);
-
-                    await Task.Run(async () =>
-                    {
-                        while (mediaPlayer.PlaybackSession.NaturalDuration.TotalMinutes==0)
-                        {
-                           await Task.Delay(1);
-                        }
-                    });
-                    //await Task.Delay(1000);
-                    Maxposition = mediaPlayer.PlaybackSession.NaturalDuration.TotalMinutes;
-                    IsSourceLoaded = true;
-                    //MusicInfo = $"title:{info.Title}\r\n AlbumArtist:{info.AlbumArtist}";
+                    await LoadFileAsync(file);
                 });
             }
         }
+
+        private ICommand _getStorageItemsCommand;
+        public ICommand GetStorageItemsCommand => _getStorageItemsCommand ?? (_getStorageItemsCommand = new RelayCommand<IReadOnlyList<IStorageItem>>(OnGetStorageItem));
+
+        public async void OnGetStorageItem(IReadOnlyList<IStorageItem> items)
+        {
+            //foreach (var item in items)
+            //{
+            //    Debug.WriteLine(item.Name);
+            //    item
+            //    //TODO WTS: Process storage item
+            //}
+            if (items.Count>0)
+            {
+                if (items[0]!=null)
+                {
+                    var file = items[0] as StorageFile;
+                    if (file.FileType.Equals(".mp3")|| file.FileType.Equals(".wma")|| file.FileType.Equals(".wav"))
+                    {
+                        await LoadFileAsync(file);
+                    }
+
+                }
+            }
+
+        }
+
     }
 }

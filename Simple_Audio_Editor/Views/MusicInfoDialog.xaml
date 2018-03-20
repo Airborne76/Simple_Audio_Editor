@@ -33,7 +33,7 @@
                     <ColumnDefinition Width="4*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Album" TextWrapping="WrapWholeWords"/>
-                <TextBox Text="{x:Bind musicProperties.Album}" Grid.Column="1" BorderThickness="1" />
+                <TextBox Text="{x:Bind musicProperties.Album}" Grid.Column="1" BorderThickness="1" IsEnabled="False" />
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -41,7 +41,7 @@
                     <ColumnDefinition Width="4*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="AlbumArtist" TextWrapping="WrapWholeWords"/>
-                <TextBox Text="{x:Bind musicProperties.AlbumArtist}" Grid.Column="1" BorderThickness="1"/>
+                <TextBox Text="{x:Bind musicProperties.AlbumArtist}" Grid.Column="1" BorderThickness="1" IsEnabled="False"/>
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -49,7 +49,7 @@
                     <ColumnDefinition Width="4*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Artist" TextWrapping="WrapWholeWords"/>
-                <TextBox Text="{x:Bind musicProperties.Artist}"  Grid.Column="1" BorderThickness="1"/>
+                <TextBox Text="{x:Bind musicProperties.Artist}"  Grid.Column="1" BorderThickness="1" IsEnabled="False"/>
             </Grid>
             <Grid >
                 <Grid.ColumnDefinitions>
@@ -65,7 +65,7 @@
                     <ColumnDefinition Width="4*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Subtitle" TextWrapping="WrapWholeWords"/>
-                <TextBox Text="{x:Bind musicProperties.Subtitle}" Grid.Column="1" BorderThickness="1"/>
+                <TextBox Text="{x:Bind musicProperties.Subtitle}" Grid.Column="1" BorderThickness="1" IsEnabled="False"/>
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -73,7 +73,7 @@
                     <ColumnDefinition Width="4*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Title" TextWrapping="WrapWholeWords"/>
-                <TextBox Text="{x:Bind musicProperties.Title}" Grid.Column="1" BorderThickness="1"/>
+                <TextBox Text="{x:Bind musicProperties.Title}" Grid.Column="1" BorderThickness="1" IsEnabled="False"/>
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -81,7 +81,7 @@
                     <ColumnDefinition Width="4*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Year" TextWrapping="WrapWholeWords"/>
-                <TextBox Text="{x:Bind musicProperties.Year}" Grid.Column="1" BorderThickness="1"/>
+                <TextBox Text="{x:Bind musicProperties.Year}" Grid.Column="1" BorderThickness="1" IsEnabled="False"/>
             </Grid>
         </StackPanel>
     </ScrollViewer>

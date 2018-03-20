@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
+using Simple_Audio_Editor.Helpers;
 using Simple_Audio_Editor.Services;
 
 using Windows.ApplicationModel.Activation;
@@ -22,6 +23,9 @@ namespace Simple_Audio_Editor.Activation
             // the new page by passing required information in the navigation parameter
             NavigationService.Navigate(_navElement, args.Arguments);
 
+            // TODO WTS: Remove or change this sample which shows a toast notification when the app is launched.
+            // You can use this sample to create toast notifications where needed in your app.
+            //Singleton<ToastNotificationsService>.Instance.ShowToastNotificationSample();
             await Task.CompletedTask;
         }
 

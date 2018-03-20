@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using Simple_Audio_Editor.Activation;
 using Simple_Audio_Editor.Helpers;
+using Simple_Audio_Editor.Services;
 
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Core;
@@ -94,6 +95,7 @@ namespace Simple_Audio_Editor.Services
 
         private IEnumerable<ActivationHandler> GetActivationHandlers()
         {
+            yield return Singleton<ToastNotificationsService>.Instance;
             yield return Singleton<BackgroundTaskService>.Instance;
         }
 
